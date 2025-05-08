@@ -1,6 +1,6 @@
 package com.mnp.p1.actors;
 
-public class WorkerActor {
+public class Worker {
 
     /*
      * • Arbeiter*in (Worker)

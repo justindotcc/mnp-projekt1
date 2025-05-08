@@ -1,6 +1,6 @@
 package com.mnp.p1.actors;
 
-public class ProductionLineActor {
+public class ProductionLine {
 
     /*
      * • Produktionsstraße (ProductionLine)

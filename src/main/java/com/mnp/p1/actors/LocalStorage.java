@@ -1,6 +1,6 @@
 package com.mnp.p1.actors;
 
-public class LocalStorageActor {
+public class LocalStorage {
 
     /*
      * • Lokales Lager (LocalStorage)
