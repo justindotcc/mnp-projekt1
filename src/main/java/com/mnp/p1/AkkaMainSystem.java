@@ -1,7 +1,9 @@
 package com.mnp.p1;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
+import com.mnp.p1.actors.ProductionLine;
 
 public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Create> {
 
@@ -18,10 +20,19 @@ public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Create> {
 
     @Override
     public Receive<Create> createReceive() {
-        return newReceiveBuilder().onMessage(Create.class, this::onCreate).build();
+        System.out.println("AkkaMainSystem.createReceive()");
+        return newReceiveBuilder()
+                .onMessage(Create.class, this::onCreate)
+                .build();
     }
 
     private Behavior<Create> onCreate(Create command) {
+
+        // spawn ProductionLine actor
+        ActorRef<ProductionLine.Command> productionLine = getContext().spawn(ProductionLine.create(), "productionLine");
+
+        // start the production line
+        productionLine.tell(new ProductionLine.StartProduction(1));
 
 
         return this;
