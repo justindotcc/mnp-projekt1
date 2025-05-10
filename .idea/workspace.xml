@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="wip OrderBook">
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="basic implementation of each worker">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/Worker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,6 +67,9 @@
 }</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -133,6 +136,15 @@
       <workItem from="1746795942440" duration="1788000" />
       <workItem from="1746797760719" duration="2867000" />
     </task>
+    <task id="LOCAL-00001" summary="basic implementation of each worker">
+      <option name="closed" value="true" />
+      <created>1746890329797</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1746890329797</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,7 +152,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="wip OrderBook" />
-    <option name="LAST_COMMIT_MESSAGE" value="wip OrderBook" />
+    <MESSAGE value="basic implementation of each worker" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic implementation of each worker" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
