@@ -1,6 +1,14 @@
 package com.mnp.p1.actors;
 
-public class LocalStorage {
+import akka.actor.AbstractActor;
+
+public class LocalStorage extends AbstractActor<LocalStorage.Command> {
+
+    interface Command {
+    }
+
+    public record receiveSpecialRequests() implements Command {
+    }
 
     /*
      * • Lokales Lager (LocalStorage)
