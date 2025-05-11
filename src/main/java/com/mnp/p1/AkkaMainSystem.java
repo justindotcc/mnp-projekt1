@@ -14,9 +14,6 @@ public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Message> {
     public interface Message {
     }
 
-    public static class Create implements Message {
-    }
-
     public static class GenerateOrder implements Message {
     }
 
@@ -25,9 +22,7 @@ public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Message> {
 
     public static Behavior<Message> create() {
         return Behaviors.setup(ctx ->
-                Behaviors.withTimers(timers ->
-                        new AkkaMainSystem(ctx, timers)
-                )
+                Behaviors.withTimers(timers -> new AkkaMainSystem(ctx, timers))
         );
     }
 
@@ -39,50 +34,36 @@ public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Message> {
         super(context);
         this.timers = timers;
 
-        // Create MainStorage
-        ActorRef<MainStorage.Message> mainStorage =
-                context.spawn(MainStorage.create(), "main-storage");
+        ActorRef<MainStorage.Message> mainStorage = context.spawn(MainStorage.create(), "main-storage");
+        ActorRef<LocalStorage.Message> localStorage = context.spawn(LocalStorage.create(mainStorage), "local-storage");
 
-        // Create LocalStorage
-        ActorRef<LocalStorage.Message> localStorage =
-                context.spawn(LocalStorage.create(mainStorage), "local-storage");
-
-        // Create Workers
         List<ActorRef<Worker.Message>> workers = new ArrayList<>();
         for (int i = 1; i <= 4; i++) {
             workers.add(context.spawn(Worker.create("Worker-" + i, localStorage), "worker-" + i));
         }
 
-        // Create ProductionLines with null OrderBook (init later)
+        this.orderBook = context.spawn(OrderBook.create(), "order-book");
+
         ActorRef<ProductionLine.Message> line1 = context.spawn(
-                ProductionLine.create(null, workers, localStorage), "line-1");
+                ProductionLine.create(orderBook, workers, localStorage), "line-1"
+        );
         ActorRef<ProductionLine.Message> line2 = context.spawn(
-                ProductionLine.create(null, workers, localStorage), "line-2");
+                ProductionLine.create(orderBook, workers, localStorage), "line-2"
+        );
 
-        List<ActorRef<ProductionLine.Message>> lines = List.of(line1, line2);
+        // initial availability
+        orderBook.tell(new OrderBook.ProductionLineAvailable(line1));
+        orderBook.tell(new OrderBook.ProductionLineAvailable(line2));
 
-        // Now create OrderBook
-        this.orderBook = context.spawn(OrderBook.create(lines), "order-book");
-
-        // Inform lines of OrderBook
-        line1.tell(new ProductionLine.InitOrderBook(orderBook));
-        line2.tell(new ProductionLine.InitOrderBook(orderBook));
-
-        // Start 15s repeating order generation
         timers.startTimerAtFixedRate("order-generator", new GenerateOrder(), Duration.ofSeconds(15));
     }
 
     @Override
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
-                .onMessage(Create.class, this::onCreate)
                 .onMessage(GenerateOrder.class, this::onGenerateOrder)
                 .onMessage(Terminate.class, this::onTerminate)
                 .build();
-    }
-
-    private Behavior<Message> onCreate(Create command) {
-        return this;
     }
 
     private Behavior<Message> onGenerateOrder(GenerateOrder msg) {
@@ -92,8 +73,8 @@ public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Message> {
         return this;
     }
 
-    private Behavior<Message> onTerminate(Terminate command) {
-        getContext().getLog().info("Terminate");
+    private Behavior<Message> onTerminate(Terminate msg) {
+        getContext().getLog().info("Factory: terminate");
         return Behaviors.stopped();
     }
 }

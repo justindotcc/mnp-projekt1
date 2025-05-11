@@ -2,70 +2,107 @@ package com.mnp.p1.actors;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.AbstractBehavior;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Receive;
+import akka.actor.typed.javadsl.*;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Random;
 
 public class Worker extends AbstractBehavior<Worker.Message> {
-
-    /*
-     * • Arbeiter*in (Worker)
-     * – Jeder Worker hat einen Namen.
-     * – Baue Karosserie: Baut die Karosserie.
-     * – Hole Spezialwünsche aus dem Lokalen Lager: Der Arbeiter geht in das lokale Lager und
-     *   holt zwei zufällige Spezialwünsche aus dem Lager
-     * – Verbaue Spezialwünsche: Baut diese in das Auto ein.
-     */
-
 
     public interface Message {
     }
 
-    public static class BuildBody implements Message {
+    public static record BuildBody(int orderId, ActorRef<ProductionLine.Message> replyTo) implements Message {
     }
 
-    public record FetchSpecialRequests() implements Message {
+    public static record BodyBuilt(int orderId, ActorRef<ProductionLine.Message> replyTo) implements Message {
     }
 
-    public record InstallSpecialRequests() implements Message {
+    public static record FetchSpecialRequests(int orderId,
+                                              ActorRef<ProductionLine.Message> replyTo) implements Message {
     }
 
-    public String name;
+    public static record SpecialRequestsFetched(int orderId, ActorRef<ProductionLine.Message> replyTo,
+                                                List<String> requests) implements Message {
+    }
 
-    private Worker(ActorContext<Message> context, String name) {
+    public static record InstallSpecialRequests(int orderId, ActorRef<ProductionLine.Message> replyTo,
+                                                List<String> requests) implements Message {
+    }
+
+    public static record SpecialRequestsInstalled(int orderId,
+                                                  ActorRef<ProductionLine.Message> replyTo) implements Message {
+    }
+
+    private final TimerScheduler<Message> timers;
+    private final String name;
+    private final ActorRef<LocalStorage.Message> localStorage;
+    private final Random random = new Random();
+
+    private Worker(
+            ActorContext<Message> context,
+            TimerScheduler<Message> timers,
+            String name,
+            ActorRef<LocalStorage.Message> localStorage
+    ) {
         super(context);
+        this.timers = timers;
         this.name = name;
+        this.localStorage = localStorage;
     }
 
     public static Behavior<Message> create(String name, ActorRef<LocalStorage.Message> localStorage) {
-        return Behaviors.setup(context -> new Worker(context, name));
+        return Behaviors.setup(context ->
+                Behaviors.withTimers(timers -> new Worker(context, timers, name, localStorage))
+        );
     }
 
     @Override
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
                 .onMessage(BuildBody.class, this::onBuildBody)
+                .onMessage(BodyBuilt.class, this::onBodyBuilt)
                 .onMessage(FetchSpecialRequests.class, this::onFetchSpecialRequests)
+                .onMessage(SpecialRequestsFetched.class, this::onSpecialRequestsFetched)
                 .onMessage(InstallSpecialRequests.class, this::onInstallSpecialRequests)
+                .onMessage(SpecialRequestsInstalled.class, this::onSpecialRequestsInstalled)
                 .build();
     }
 
-    private Behavior<Message> onBuildBody(BuildBody command) {
-        getContext().getLog().info("Worker {} is building the body", name);
-
+    private Behavior<Message> onBuildBody(BuildBody msg) {
+        getContext().getLog().info("Worker {}: building body for order #{}", name, msg.orderId);
+        int delay = 5 + random.nextInt(6);
+        timers.startSingleTimer(msg, new BodyBuilt(msg.orderId, msg.replyTo), Duration.ofSeconds(delay));
         return this;
     }
 
-    private Behavior<Message> onFetchSpecialRequests(FetchSpecialRequests command) {
-        getContext().getLog().info("Worker {} is fetching special requests", name);
-
+    private Behavior<Message> onBodyBuilt(BodyBuilt msg) {
+        getContext().getLog().info("Worker {}: finished body #{}", name, msg.orderId);
+        msg.replyTo.tell(new ProductionLine.BodyBuilt(msg.orderId, getContext().getSelf()));
         return this;
     }
 
-    private Behavior<Message> onInstallSpecialRequests(InstallSpecialRequests command) {
-        getContext().getLog().info("Worker {} is installing special requests", name);
+    private Behavior<Message> onFetchSpecialRequests(FetchSpecialRequests msg) {
+        getContext().getLog().info("Worker {}: fetching special requests for order #{}", name, msg.orderId);
+        localStorage.tell(new LocalStorage.FetchRequests(msg.orderId, getContext().getSelf(), msg.replyTo));
+        return this;
+    }
 
+    private Behavior<Message> onSpecialRequestsFetched(SpecialRequestsFetched msg) {
+        getContext().getLog().info("Worker {}: fetched {} for order #{}", name, msg.requests, msg.orderId);
+        getContext().getLog().info("Worker {}: installing special requests for order #{}", name, msg.orderId);
+        msg.replyTo.tell(new ProductionLine.SpecialRequestsInstalled(msg.orderId));
+        return this;
+    }
+
+    private Behavior<Message> onInstallSpecialRequests(InstallSpecialRequests msg) {
+        // not used in this implementation
+        return this;
+    }
+
+    private Behavior<Message> onSpecialRequestsInstalled(SpecialRequestsInstalled msg) {
+        // not used in this implementation
         return this;
     }
 }

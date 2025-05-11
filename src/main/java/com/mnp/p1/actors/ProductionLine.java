@@ -4,8 +4,8 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 
-import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 
 public class ProductionLine extends AbstractBehavior<ProductionLine.Message> {
 
@@ -20,19 +20,21 @@ public class ProductionLine extends AbstractBehavior<ProductionLine.Message> {
         }
     }
 
-    public static final class StopProduction implements Message {
+    public static final class BodyBuilt implements Message {
         public final int orderId;
+        public final ActorRef<Worker.Message> worker;
 
-        public StopProduction(int orderId) {
+        public BodyBuilt(int orderId, ActorRef<Worker.Message> worker) {
             this.orderId = orderId;
+            this.worker = worker;
         }
     }
 
-    public static final class InitOrderBook implements Message {
-        public final ActorRef<OrderBook.Message> orderBook;
+    public static final class SpecialRequestsInstalled implements Message {
+        public final int orderId;
 
-        public InitOrderBook(ActorRef<OrderBook.Message> orderBook) {
-            this.orderBook = orderBook;
+        public SpecialRequestsInstalled(int orderId) {
+            this.orderId = orderId;
         }
     }
 
@@ -42,17 +44,18 @@ public class ProductionLine extends AbstractBehavior<ProductionLine.Message> {
             ActorRef<LocalStorage.Message> localStorage
     ) {
         return Behaviors.setup(ctx ->
-                Behaviors.withTimers(timers ->
-                        new ProductionLine(ctx, timers, orderBook, workers, localStorage)
-                )
+                Behaviors.withTimers(timers -> new ProductionLine(ctx, timers, orderBook, workers, localStorage))
         );
     }
 
     private final TimerScheduler<Message> timers;
-    private ActorRef<OrderBook.Message> orderBook; // now assignable
+    private final ActorRef<OrderBook.Message> orderBook;
     private final List<ActorRef<Worker.Message>> workers;
     private final ActorRef<LocalStorage.Message> localStorage;
+    private final Random random = new Random();
     private boolean isBusy = false;
+    private int currentOrder;
+    private ActorRef<Worker.Message> currentWorker;
 
     private ProductionLine(
             ActorContext<Message> context,
@@ -72,30 +75,39 @@ public class ProductionLine extends AbstractBehavior<ProductionLine.Message> {
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
                 .onMessage(StartProduction.class, this::onStartProduction)
-                .onMessage(StopProduction.class, this::onStopProduction)
-                .onMessage(InitOrderBook.class, this::onInitOrderBook)
+                .onMessage(BodyBuilt.class, this::onBodyBuilt)
+                .onMessage(SpecialRequestsInstalled.class, this::onSpecialRequestsInstalled)
                 .build();
-    }
-
-    private Behavior<Message> onInitOrderBook(InitOrderBook msg) {
-        this.orderBook = msg.orderBook;
-        getContext().getLog().info("ProductionLine received OrderBook reference");
-        orderBook.tell(new OrderBook.ProductionLineAvailable(getContext().getSelf()));
-        return this;
     }
 
     private Behavior<Message> onStartProduction(StartProduction msg) {
         if (isBusy) return this;
         isBusy = true;
-        getContext().getLog().info("Starting production for order #{}", msg.orderId);
-        int delay = 5 + (int) (Math.random() * 6);
-        timers.startSingleTimer(new StopProduction(msg.orderId), Duration.ofSeconds(delay));
+        this.currentOrder = msg.orderId;
+        this.currentWorker = workers.get(random.nextInt(workers.size()));
+        getContext().getLog().info(
+                "ProductionLine {}: starting order #{} with {}",
+                getContext().getSelf().path().name(), currentOrder, currentWorker.path().name()
+        );
+        currentWorker.tell(new Worker.BuildBody(currentOrder, getContext().getSelf()));
         return this;
     }
 
-    private Behavior<Message> onStopProduction(StopProduction msg) {
+    private Behavior<Message> onBodyBuilt(BodyBuilt msg) {
+        getContext().getLog().info(
+                "ProductionLine {}: body built for order #{} by {}",
+                getContext().getSelf().path().name(), msg.orderId, msg.worker.path().name()
+        );
+        msg.worker.tell(new Worker.FetchSpecialRequests(currentOrder, getContext().getSelf()));
+        return this;
+    }
+
+    private Behavior<Message> onSpecialRequestsInstalled(SpecialRequestsInstalled msg) {
+        getContext().getLog().info(
+                "ProductionLine {}: finished order #{}",
+                getContext().getSelf().path().name(), msg.orderId
+        );
         isBusy = false;
-        getContext().getLog().info("Finished production for order #{}", msg.orderId);
         orderBook.tell(new OrderBook.ProductionLineAvailable(getContext().getSelf()));
         return this;
     }
