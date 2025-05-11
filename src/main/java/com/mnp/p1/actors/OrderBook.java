@@ -8,82 +8,80 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-/*
- * Auftragsbuch (OrderBook)
- * – Neuer Auftrag: Ein neuer Auftrag wird in das Auftragsbuch übernommen, dies kann einfach eine Nummer sein.
- * – Auftrag zuweisen: Der älteste nicht bearbeitete Auftrag wird der nächsten freien Produktionsstraße
- *  zugewiesen. Sollte keine vorliegen, wird 10 Sekunden gewartet und ein neuer Zuweisungsversuch unternommen.
- */
-
 public class OrderBook extends AbstractBehavior<OrderBook.Message> {
 
     public interface Message {
     }
 
-    public static class Create implements Message {
+    public static final class NewOrder implements Message {
+        public final int orderId;
+
+        public NewOrder(int orderId) {
+            this.orderId = orderId;
+        }
     }
 
-    public record NewOrder(int orderId) implements Message {
+    public static final class AssignOrder implements Message {
     }
 
-    public record AssignOrder() implements Message {
+    public static final class ProductionLineAvailable implements Message {
+        public final ActorRef<ProductionLine.Message> productionLine;
+
+        public ProductionLineAvailable(ActorRef<ProductionLine.Message> productionLine) {
+            this.productionLine = productionLine;
+        }
     }
 
     private final Queue<Integer> orders = new LinkedList<>();
     private final List<ActorRef<ProductionLine.Message>> productionLines;
 
     public static Behavior<Message> create(List<ActorRef<ProductionLine.Message>> productionLines) {
-        return Behaviors.setup(context -> Behaviors.withTimers(timers -> new OrderBook(context, timers, productionLines)));
-
+        return Behaviors.setup(ctx ->
+                Behaviors.withTimers(timers -> new OrderBook(ctx, timers, productionLines))
+        );
     }
 
     private final TimerScheduler<Message> timers;
 
     private OrderBook(ActorContext<Message> context, TimerScheduler<Message> timers, List<ActorRef<ProductionLine.Message>> productionLines) {
         super(context);
-        this.productionLines = productionLines;
         this.timers = timers;
-        getContext().getLog().info("OrderBook actor created.");
-        getContext().getSelf().tell(new NewOrder(1));
-        getContext().getSelf().tell(new AssignOrder());
+        this.productionLines = productionLines;
     }
 
     @Override
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
-                .onMessage(Create.class, this::onCreate)
                 .onMessage(NewOrder.class, this::onNewOrder)
-                .onMessage(AssignOrder.class, this::onAssignOrder)
+                .onMessage(ProductionLineAvailable.class, this::onProductionLineAvailable)
                 .build();
-    }
-
-    private Behavior<Message> onCreate(Create message) {
-        return this;
     }
 
     private Behavior<Message> onNewOrder(NewOrder message) {
         orders.add(message.orderId);
-        this.getContext().getSelf().tell(new AssignOrder());
-
         getContext().getLog().info("New order added: {}", message.orderId);
-
-        this.timers.startSingleTimer("NewOrderTimer",
-                new NewOrder(message.orderId + 1),
-                java.time.Duration.ofSeconds(15)
-        );
+        assignNextOrder();
         return this;
     }
 
-    private Behavior<Message> onAssignOrder(AssignOrder command) {
+    private Behavior<Message> onProductionLineAvailable(ProductionLineAvailable message) {
+        assignToLine(message.productionLine);
+        return this;
+    }
 
+    private void assignNextOrder() {
         if (!orders.isEmpty()) {
-            int orderId = orders.poll();
-            getContext().getLog().info("Assigning order: {}", orderId);
+            for (ActorRef<ProductionLine.Message> line : productionLines) {
+                assignToLine(line);
+            }
         }
-
-
-        return this;
     }
 
-
+    private void assignToLine(ActorRef<ProductionLine.Message> line) {
+        if (!orders.isEmpty()) {
+            int nextOrder = orders.poll();
+            line.tell(new ProductionLine.StartProduction(nextOrder));
+            getContext().getLog().info("Assigned order #{} to line {}", nextOrder, line.path().name());
+        }
+    }
 }
