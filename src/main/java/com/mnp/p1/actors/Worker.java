@@ -1,5 +1,6 @@
 package com.mnp.p1.actors;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
@@ -18,7 +19,7 @@ public class Worker extends AbstractBehavior<Worker.Message> {
      */
 
 
-    interface Message {
+    public interface Message {
     }
 
     public static class BuildBody implements Message {
@@ -37,7 +38,7 @@ public class Worker extends AbstractBehavior<Worker.Message> {
         this.name = name;
     }
 
-    public static Behavior<Message> create(String name) {
+    public static Behavior<Message> create(String name, ActorRef<LocalStorage.Message> localStorage) {
         return Behaviors.setup(context -> new Worker(context, name));
     }
 

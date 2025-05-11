@@ -1,5 +1,6 @@
 package com.mnp.p1.actors;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
@@ -18,7 +19,7 @@ import akka.actor.typed.javadsl.Receive;
 
 public class LocalStorage extends AbstractBehavior<LocalStorage.Message> {
 
-    interface Message {
+    public interface Message {
     }
 
     public record receiveSpecialRequests() implements Message {
@@ -34,7 +35,7 @@ public class LocalStorage extends AbstractBehavior<LocalStorage.Message> {
         super(context);
     }
 
-    public static Behavior<Message> create() {
+    public static Behavior<Message> create(ActorRef<MainStorage.Message> mainStorage) {
         return Behaviors.setup(LocalStorage::new);
     }
 

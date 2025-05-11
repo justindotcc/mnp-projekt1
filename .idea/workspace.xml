@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="basic implementation of each worker">
+    <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="feat: basic interval implementation of OrderBook">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/MainStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" afterDir="false" />
@@ -69,7 +69,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
@@ -104,7 +104,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -144,7 +144,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746890329797</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: basic interval implementation of OrderBook">
+      <option name="closed" value="true" />
+      <created>1746899625169</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1746899625169</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,7 +161,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="wip OrderBook" />
     <MESSAGE value="basic implementation of each worker" />
-    <option name="LAST_COMMIT_MESSAGE" value="basic implementation of each worker" />
+    <MESSAGE value="feat: basic interval implementation of OrderBook" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: basic interval implementation of OrderBook" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

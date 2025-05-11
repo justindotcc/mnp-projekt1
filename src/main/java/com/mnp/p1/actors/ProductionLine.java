@@ -1,7 +1,10 @@
 package com.mnp.p1.actors;
 
+import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
+
+import java.util.List;
 
 /*
  * • Produktionsstraße (ProductionLine)
@@ -16,6 +19,9 @@ public class ProductionLine extends AbstractBehavior<ProductionLine.Message> {
     public interface Message {
     }
 
+    public record Create(List<ActorRef<Worker.Message>> workers) implements Message {
+    }
+
     public record StartProduction(int orderId) implements Message {
         // orderId is the ID of the order to be produced
     }
@@ -24,24 +30,34 @@ public class ProductionLine extends AbstractBehavior<ProductionLine.Message> {
         // orderId is the ID of the order to be stopped
     }
 
-    public static Behavior<Message> create() {
-        return Behaviors.setup(context -> Behaviors.withTimers(timers -> new ProductionLine(context, timers)));
+    public static Behavior<Message> create(List<ActorRef<Worker.Message>> workers, ActorRef<LocalStorage.Message> localStorage) {
+        return Behaviors.setup(context -> Behaviors.withTimers(timers -> new ProductionLine(context, timers, workers, localStorage)));
     }
 
     private final TimerScheduler<Message> timers;
+    private final List<ActorRef<Worker.Message>> workers;
+    private boolean isFree = true;
 
-    private ProductionLine(ActorContext<Message> context, TimerScheduler<Message> timers) {
+    private ProductionLine(ActorContext<Message> context, TimerScheduler<Message> timers, List<ActorRef<Worker.Message>> workers, ActorRef<LocalStorage.Message> localStorage) {
         super(context);
         this.timers = timers;
+        this.workers = workers;
     }
 
     @Override
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
+                .onMessage(Create.class, this::onCreate)
                 .onMessage(StartProduction.class, this::onStartProduction)
                 .onMessage(StopProduction.class, this::onStopProduction)
                 .build();
     }
+
+    private Behavior<Message> onCreate(Create command) {
+        getContext().getLog().info("ProductionLine actor created.");
+        return this;
+    }
+    
 
     private Behavior<Message> onStartProduction(StartProduction command) {
         int orderId = command.orderId;

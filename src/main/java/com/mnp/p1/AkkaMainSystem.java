@@ -3,7 +3,11 @@ package com.mnp.p1;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
-import com.mnp.p1.actors.OrderBook;
+import com.mnp.p1.actors.*;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
     /*
     Aufgabe 1 (Die Autofabrik)
@@ -78,30 +82,74 @@ public class AkkaMainSystem extends AbstractBehavior<AkkaMainSystem.Message> {
     public static class Create implements Message {
     }
 
+    public static class GenerateOrder implements Message {
+    }
+
     public static class Terminate implements Message {
     }
 
     public static Behavior<Message> create() {
-        return Behaviors.setup(AkkaMainSystem::new);
+        return Behaviors.setup(ctx ->
+                Behaviors.withTimers(timers ->
+                        new AkkaMainSystem(ctx, timers)
+                )
+        );
     }
 
-    private AkkaMainSystem(ActorContext<Message> context) {
+    private final TimerScheduler<Message> timers;
+    private final ActorRef<OrderBook.Message> orderBook;
+    private int orderCounter = 0;
+
+    private AkkaMainSystem(ActorContext<Message> context, TimerScheduler<Message> timers) {
         super(context);
+        this.timers = timers;
+
+        // Create MainStorage
+        ActorRef<MainStorage.Message> mainStorage =
+                context.spawn(MainStorage.create(), "main-storage");
+
+        // Create LocalStorage
+        ActorRef<LocalStorage.Message> localStorage =
+                context.spawn(LocalStorage.create(mainStorage), "local-storage");
+
+        // Create WorkerActors
+        List<ActorRef<Worker.Message>> workers = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            workers.add(context.spawn(Worker.create("Worker-" + i, localStorage), "worker-" + i));
+        }
+
+        // Create ProductionLines
+        ActorRef<ProductionLine.Message> line1 = context.spawn(
+                ProductionLine.create(workers, localStorage), "line-1");
+
+        ActorRef<ProductionLine.Message> line2 = context.spawn(
+                ProductionLine.create(workers, localStorage), "line-2");
+
+        // Create OrderBook
+        this.orderBook = context.spawn(
+                OrderBook.create(List.of(line1, line2)), "order-book");
+
+        // Start 15s repeating order generation
+        timers.startTimerAtFixedRate("order-generator", new GenerateOrder(), Duration.ofSeconds(15));
     }
 
     @Override
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
                 .onMessage(Create.class, this::onCreate)
+                .onMessage(GenerateOrder.class, this::onGenerateOrder)
                 .onMessage(Terminate.class, this::onTerminate)
                 .build();
     }
 
     private Behavior<Message> onCreate(Create command) {
+        return this;
+    }
 
-        var orderBook = this.getContext().spawn(OrderBook.create(), "orderBook");
-        orderBook.tell(new OrderBook.Create());
-
+    private Behavior<Message> onGenerateOrder(GenerateOrder msg) {
+        orderCounter++;
+        getContext().getLog().info("Factory: Generating new order #{}", orderCounter);
+        orderBook.tell(new OrderBook.NewOrder(orderCounter));
         return this;
     }
 
