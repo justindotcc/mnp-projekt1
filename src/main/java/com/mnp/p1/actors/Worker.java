@@ -65,8 +65,6 @@ public class Worker extends AbstractBehavior<Worker.Message> {
                 .onMessage(BodyBuilt.class, this::onBodyBuilt)
                 .onMessage(FetchSpecialRequests.class, this::onFetchSpecialRequests)
                 .onMessage(SpecialRequestsFetched.class, this::onSpecialRequestsFetched)
-                .onMessage(InstallSpecialRequests.class, this::onInstallSpecialRequests)
-                .onMessage(SpecialRequestsInstalled.class, this::onSpecialRequestsInstalled)
                 .build();
     }
 
@@ -93,16 +91,6 @@ public class Worker extends AbstractBehavior<Worker.Message> {
         getContext().getLog().info("Worker {}: fetched {} for order #{}", name, msg.requests, msg.orderId);
         getContext().getLog().info("Worker {}: installing special requests for order #{}", name, msg.orderId);
         msg.replyTo.tell(new ProductionLine.SpecialRequestsInstalled(msg.orderId));
-        return this;
-    }
-
-    private Behavior<Message> onInstallSpecialRequests(InstallSpecialRequests msg) {
-        // not used in this implementation
-        return this;
-    }
-
-    private Behavior<Message> onSpecialRequestsInstalled(SpecialRequestsInstalled msg) {
-        // not used in this implementation
         return this;
     }
 }

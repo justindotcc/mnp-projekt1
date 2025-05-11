@@ -4,6 +4,7 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.*;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -30,6 +31,9 @@ public class OrderBook extends AbstractBehavior<OrderBook.Message> {
         }
     }
 
+    private static final class RetryAssignment implements Message {
+    }
+
     public static Behavior<Message> create() {
         return Behaviors.setup(ctx ->
                 Behaviors.withTimers(timers -> new OrderBook(ctx, timers))
@@ -50,6 +54,10 @@ public class OrderBook extends AbstractBehavior<OrderBook.Message> {
         return newReceiveBuilder()
                 .onMessage(NewOrder.class, this::onNewOrder)
                 .onMessage(ProductionLineAvailable.class, this::onProductionLineAvailable)
+                .onMessage(RetryAssignment.class, msg -> {
+                    assignOrders();
+                    return this;
+                })
                 .build();
     }
 
@@ -74,6 +82,11 @@ public class OrderBook extends AbstractBehavior<OrderBook.Message> {
             availableLines.remove(line);
             getContext().getLog().info("OrderBook: assigning order #{} to line {}", orderId, line.path().name());
             line.tell(new ProductionLine.StartProduction(orderId));
+        }
+
+        if (!orders.isEmpty() && availableLines.isEmpty()) {
+            getContext().getLog().info("OrderBook: No available lines, retrying in 10s...");
+            timers.startSingleTimer(new RetryAssignment(), Duration.ofSeconds(10));
         }
     }
 }
