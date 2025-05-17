@@ -1,3 +1,9 @@
+/**
+ * Isabelle Bille 156252
+ * Justin Gottwald 201237
+ * Ilia Orlov
+ */
+
 package com.mnp.p1.actors;
 
 import akka.actor.typed.ActorRef;
