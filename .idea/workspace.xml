@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="feat: connection between MainSystem, OrderBook, ProductionLine">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/logback.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/MainStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/MainStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/Worker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +87,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "new-basic-structure",
+    "git-widget-placeholder": "busyWorkers",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Studium/MNP/mnp-projekt1",
