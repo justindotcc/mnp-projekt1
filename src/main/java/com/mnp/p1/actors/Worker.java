@@ -95,7 +95,11 @@ public class Worker extends AbstractBehavior<Worker.Message> {
     }
 
     private Behavior<Message> onIsAvailable(IsAvailable msg) {
-        getContext().getLog().info("Worker {}: is available", name);
+        if (isBusy) {
+            getContext().getLog().info("Worker {}: is busy", name);
+        } else {
+            getContext().getLog().info("Worker {}: is available", name);
+        }
         msg.replyTo.tell(new ProductionLine.Availability(!isBusy, getContext().getSelf()));
         return this;
     }
