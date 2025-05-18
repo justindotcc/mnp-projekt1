@@ -14,6 +14,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 
+import com.mnp.p1.actors.ProductionLine;
+
 /**
  * Class for a worker who carries out orders.
  * A worker can only work on one job at a time.
@@ -24,6 +26,10 @@ public class Worker extends AbstractBehavior<Worker.Message> {
 
     public interface Message {
     }
+
+    public static record IsAvailable(ActorRef<ProductionLine.Message> replyTo) implements Message {
+    }
+
 
     //Order: Build new car body for orderId. Contains reference to the ProductionLine for the answers.
     public static record BuildBody(int orderId, ActorRef<ProductionLine.Message> replyTo) implements Message {
@@ -56,6 +62,8 @@ public class Worker extends AbstractBehavior<Worker.Message> {
     private final ActorRef<LocalStorage.Message> localStorage;
     private final Random random = new Random();
 
+    public boolean isBusy = false;
+
     //Create a new worker-actor with name and reference to the LocalStorage.
     private Worker(
             ActorContext<Message> context,
@@ -78,11 +86,18 @@ public class Worker extends AbstractBehavior<Worker.Message> {
     @Override
     public Receive<Message> createReceive() {
         return newReceiveBuilder()
+                .onMessage(IsAvailable.class, this::onIsAvailable)
                 .onMessage(BuildBody.class, this::onBuildBody)
                 .onMessage(BodyBuilt.class, this::onBodyBuilt)
                 .onMessage(FetchSpecialRequests.class, this::onFetchSpecialRequests)
                 .onMessage(SpecialRequestsFetched.class, this::onSpecialRequestsFetched)
                 .build();
+    }
+
+    private Behavior<Message> onIsAvailable(IsAvailable msg) {
+        getContext().getLog().info("Worker {}: is available", name);
+        msg.replyTo.tell(new ProductionLine.Availability(!isBusy, getContext().getSelf()));
+        return this;
     }
 
     /**
@@ -91,6 +106,11 @@ public class Worker extends AbstractBehavior<Worker.Message> {
      */
 
     private Behavior<Message> onBuildBody(BuildBody msg) {
+        if (isBusy) {
+            getContext().getLog().info("Worker {}: busy, order #{} is skipped", name, msg.orderId);
+            return this;
+        }
+        isBusy = true;
         getContext().getLog().info("Worker {}: building body for order #{}", name, msg.orderId);
         int delay = 5 + random.nextInt(6);
         timers.startSingleTimer(msg, new BodyBuilt(msg.orderId, msg.replyTo), Duration.ofSeconds(delay));
@@ -129,6 +149,7 @@ public class Worker extends AbstractBehavior<Worker.Message> {
         getContext().getLog().info("Worker {}: fetched {} for order #{}", name, msg.requests, msg.orderId);
         getContext().getLog().info("Worker {}: installing special requests for order #{}", name, msg.orderId);
         msg.replyTo.tell(new ProductionLine.SpecialRequestsInstalled(msg.orderId));
+        isBusy = false;
         return this;
     }
 }

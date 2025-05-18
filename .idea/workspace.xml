@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="feat: connection between MainSystem, OrderBook, ProductionLine">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/logback.xml" afterDir="false" />
+    <list default="true" id="0bf935c1-7493-4963-ae82-5012ec4f6f7b" name="Changes" comment="chore: small refactoring">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaMainSystem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/AkkaStart.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/LocalStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/MainStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/MainStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/OrderBook.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/ProductionLine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mnp/p1/actors/Worker.java" afterDir="false" />
     </list>
@@ -85,31 +79,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Gradle.Load Gradle Dependencies.executor": "Run",
-    "Gradle.P1 [:com.mnp.p1.AkkaStart.main()].executor": "Run",
-    "Gradle.mnp-projekt1 [:AkkaStart.main()].executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "new-basic-structure",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Studium/MNP/mnp-projekt1",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.editor",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Load Gradle Dependencies.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.P1 [:com.mnp.p1.AkkaStart.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.mnp-projekt1 [:AkkaStart.main()].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Studium/MNP/mnp-projekt1&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="mnp-projekt1" />
